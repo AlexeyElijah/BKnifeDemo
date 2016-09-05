@@ -4,9 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 
-/**
- * Created by JokAr on 16/8/6.
- */
 public class ActivityProvider implements Provider {
 
     @Override

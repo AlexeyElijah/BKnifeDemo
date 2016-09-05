@@ -23,10 +23,6 @@ import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-/**
- * 编译期间处理注解
- * Created by hanks on 2016/7/31.
- */
 @SupportedAnnotationTypes("xyz.hanks.BindView")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class BindViewProcessor extends AbstractProcessor {

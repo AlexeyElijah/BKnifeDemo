@@ -3,9 +3,6 @@ package com.zwc.inject.provider;
 import android.content.Context;
 import android.view.View;
 
-/**
- * Created by JokAr on 16/8/6.
- */
 public interface Provider {
     Context getContext(Object object);
 
