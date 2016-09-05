@@ -18,14 +18,19 @@ public class BKnife {
     private static final ViewProvider viewProvider = new ViewProvider();
     private static final HashMap<String, IBind> injectMap = new HashMap<>();
 
+    /**
+     * 绑定Activity时使用;
+     * @param activity
+     */
     public static void inject(Activity activity) {
         inject(activity, activity, activityProvider);
     }
 
-    public static void inject(View view) {
-        inject(view, view);
-    }
-
+    /**
+     *
+     * @param host 需要绑定的成员变量所在的类.
+     * @param view inflate的view
+     */
     public static void inject(Object host, View view) {
         inject(host, view, viewProvider);
     }

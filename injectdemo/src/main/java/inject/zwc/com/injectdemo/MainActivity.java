@@ -1,6 +1,7 @@
 package inject.zwc.com.injectdemo;
 
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,11 +11,15 @@ import com.zwc.inject.annotation.BindView;
 import com.zwc.inject.annotation.BindViews;
 import com.zwc.inject.annotation.OnClick;
 
+import inject.zwc.com.injectdemo.adapter.FragContainerVPAdapter;
+
 public class MainActivity extends AppCompatActivity {
-        @BindView(R.id.tv_container)
-        TextView mTvContainer;
-        @BindViews({R.id.tv_binds_container1, R.id.tv_binds_container2, R.id.tv_binds_container3, R.id.tv_binds_container4})
-        TextView[] mTvConArray;
+    @BindView(R.id.tv_container)
+    TextView mTvContainer;
+    @BindViews({R.id.tv_binds_container1, R.id.tv_binds_container2, R.id.tv_binds_container3, R.id.tv_binds_container4})
+    TextView[] mTvConArray;
+    @BindView(R.id.vp_frag_container)
+    ViewPager mFragContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < mTvConArray.length; i++) {
             mTvConArray[i].setText("bins+" + i + "   ");
         }
+        mFragContainer.setAdapter(new FragContainerVPAdapter(getSupportFragmentManager()));
     }
 
     @OnClick(R.id.bt_click1)
