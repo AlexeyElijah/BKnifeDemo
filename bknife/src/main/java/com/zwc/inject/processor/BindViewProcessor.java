@@ -20,6 +20,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
@@ -33,7 +34,7 @@ import javax.tools.JavaFileObject;
 public class BindViewProcessor extends AbstractProcessor {
     public static final String SUFFIX = "$ViewBinder";
     private Messager messager;
-    private Map<String, List<VariableElement>> mElementMap = new HashMap<>();//用来存储注解元素的map
+    private Map<String, List<Element>> mElementMap = new HashMap<>();//用来存储注解元素的map
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -47,7 +48,7 @@ public class BindViewProcessor extends AbstractProcessor {
         findBindViewAnno(roundEnv);
         //寻找BindViews注解,添加到map中
         findBindViewsAnno(roundEnv);
-        //寻找OnClick注解,添加到map中
+//        //寻找OnClick注解,添加到map中
         findOnClickAnno(roundEnv);
 
         //进行类的生成工作
@@ -63,7 +64,7 @@ public class BindViewProcessor extends AbstractProcessor {
             }
             VariableElement variableElement = (VariableElement) element;
             String className = element.getEnclosingElement().getSimpleName().toString();
-            List<VariableElement> variableElementList = mElementMap.get(className);
+            List<Element> variableElementList = mElementMap.get(className);
             if (variableElementList == null) {
                 variableElementList = new ArrayList<>();
                 mElementMap.put(className, variableElementList);
@@ -79,7 +80,7 @@ public class BindViewProcessor extends AbstractProcessor {
             }
             VariableElement variableElement = (VariableElement) element;
             String className = element.getEnclosingElement().getSimpleName().toString();
-            List<VariableElement> variableElementList = mElementMap.get(className);
+            List<Element> variableElementList = mElementMap.get(className);
             if (variableElementList == null) {
                 variableElementList = new ArrayList<>();
                 mElementMap.put(className, variableElementList);
@@ -90,59 +91,61 @@ public class BindViewProcessor extends AbstractProcessor {
 
     private void findOnClickAnno(RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(OnClick.class)) {
-            if (element == null || !(element instanceof VariableElement)) {
+            if (element == null) {
                 continue;
             }
-            VariableElement variableElement = (VariableElement) element;
+            ExecutableElement executableElement = (ExecutableElement) element;
             String className = element.getEnclosingElement().getSimpleName().toString();
-            List<VariableElement> variableElementList = mElementMap.get(className);
-            if (variableElementList == null) {
-                variableElementList = new ArrayList<>();
-                mElementMap.put(className, variableElementList);
+            List<Element> executableElementList = mElementMap.get(className);
+            if (executableElementList == null) {
+                executableElementList = new ArrayList<>();
+                mElementMap.put(className, executableElementList);
             }
-            variableElementList.add(variableElement);
+            executableElementList.add(executableElement);
         }
     }
 
 //生成内部类的方法
 
-    private void generate(Map<String, List<VariableElement>> map) {
+    private void generate(Map<String, List<Element>> map) {
         if (null == map || map.size() == 0) {
             return;
         }
         for (String className : map.keySet()) {
-            List<VariableElement> variableElementList = map.get(className);
-            if (variableElementList == null || variableElementList.size() <= 0) {
+            List<Element> elementList = map.get(className);
+            if (elementList == null || elementList.size() <= 0) {
                 continue;
             }
             //生成package 和 import的类
-            String packageName = variableElementList.get(0).getEnclosingElement().getEnclosingElement().toString();
+            String packageName = elementList.get(0).getEnclosingElement().getEnclosingElement().toString();
             StringBuilder builder = new StringBuilder()
                     .append("package ").append(packageName).append(";\n\n")
                     .append("import com.zwc.inject.provider.Provider; \n")
+                    .append("import android.view.View;\n")
                     .append("public class ").append(className).append(SUFFIX).append(" implements com.zwc.inject.IBind ").append("{\n") // open class
                     .append("    public void inject(Object host, Object object, Provider provider) {\n")
-                    .append("        ").append(className).append(" activity = (").append(className).append(")host;\n");
-            for (VariableElement variableElement : variableElementList) {
-                BindView bindView = variableElement.getAnnotation(BindView.class);
-                BindViews bindViews = variableElement.getAnnotation(BindViews.class);
-                OnClick onClick = variableElement.getAnnotation(OnClick.class);
+                    .append("\tfinal ").append(className).append(" hostClass = (").append(className).append(")host;\n");
+            for (Element element : elementList) {
+                BindView bindView = element.getAnnotation(BindView.class);
+                BindViews bindViews = element.getAnnotation(BindViews.class);
+                OnClick onClick = element.getAnnotation(OnClick.class);
 
                 if (bindView != null) {
                     //生成bindView注解相关代码
                     log(bindView.toString());
-                    builder.append("        activity.").append(variableElement.getSimpleName().toString()).append("=(").append(variableElement.asType()).append(")provider.findView(").append("object,").append(bindView.value()).append(");\n");
+                    builder.append("\thostClass.").append(element.getSimpleName().toString()).append("=(").append(element.asType()).append(")provider.findView(").append("object,").append(bindView.value()).append(");\n");
                 } else if (bindViews != null) {
                     //生成bindViews注解相关代码
                     log(bindViews.toString());
                     int[] value = bindViews.value();
-                    builder.append("        activity.").append(variableElement.getSimpleName().toString()).append("=").append("new ").append(variableElement.asType().toString().replace("[]","")).append("[").append(value.length).append("];\n");
-                    for(int i=0;i<value.length;i++){
-                        builder.append("        activity.").append(variableElement.getSimpleName().toString()).append("[").append(i).append("]").append("=(").append(variableElement.asType().toString().replace("[]","")).append(")provider.findView(").append("object,").append(value[i]).append(");\n");
+                    builder.append("\thostClass.").append(element.getSimpleName().toString()).append("=").append("new ").append(element.asType().toString().replace("[]", "")).append("[").append(value.length).append("];\n");
+                    for (int i = 0; i < value.length; i++) {
+                        builder.append("\thostClass.").append(element.getSimpleName().toString()).append("[").append(i).append("]").append("=(").append(element.asType().toString().replace("[]", "")).append(")provider.findView(").append("object,").append(value[i]).append(");\n");
                     }
                 } else if (onClick != null) {
                     //生成OnClick注解相关代码
                     log(onClick.toString());
+                    builder.append("\tprovider.findView(").append("object," + onClick.value()).append(").setOnClickListener( new View.OnClickListener() {\n").append("\t\t public void onClick(View view) {\n").append("\t\t\t\thostClass."+element.getSimpleName()+"();\n").append("\t\t\t}\n\t\t});\n");
                 }
             }
             builder.append("    }\n}\n");

@@ -36,7 +36,7 @@ public class BKnife {
             IBind inject = injectMap.get(className);
 
             if (inject == null) {
-                Class<?> aClass = Class.forName(className + BindViewProcessor.SUFFIX);
+                Class<?> aClass = Class.forName(className + BindViewProcessor.SUFFIX,false,host.getClass().getClassLoader());
                 inject = (IBind) aClass.newInstance();
                 injectMap.put(className, inject);
             }
