@@ -2,19 +2,21 @@ package com.zwc.inject;
 
 
 import android.app.Activity;
-import android.support.v4.util.ArrayMap;
+import android.view.View;
 
+import com.zwc.inject.processor.BindViewProcessor;
 import com.zwc.inject.provider.ActivityProvider;
 import com.zwc.inject.provider.Provider;
 import com.zwc.inject.provider.ViewProvider;
 
-import javax.swing.text.View;
+import java.util.HashMap;
+
 
 public class BKnife {
     private static final ActivityProvider activityProvider = new ActivityProvider();
 
     private static final ViewProvider viewProvider = new ViewProvider();
-    private static final ArrayMap<String, Bind> injectMap = new ArrayMap<>();
+    private static final HashMap<String, IBind> injectMap = new HashMap<>();
 
     public static void inject(Activity activity) {
         inject(activity, activity, activityProvider);
@@ -24,18 +26,18 @@ public class BKnife {
         inject(view, view);
     }
 
-    private static void inject(Object host, View view) {
+    public static void inject(Object host, View view) {
         inject(host, view, viewProvider);
     }
 
     private static void inject(Object host, Object object, Provider provider) {
         String className = host.getClass().getName();
         try {
-            Bind inject = injectMap.get(className);
+            IBind inject = injectMap.get(className);
 
             if (inject == null) {
-                Class<?> aClass = Class.forName(className + "$$ViewInject");
-                inject = (Bind) aClass.newInstance();
+                Class<?> aClass = Class.forName(className + BindViewProcessor.SUFFIX);
+                inject = (IBind) aClass.newInstance();
                 injectMap.put(className, inject);
             }
             inject.inject(host, object, provider);

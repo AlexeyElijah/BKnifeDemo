@@ -23,7 +23,7 @@ import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-@SupportedAnnotationTypes("xyz.hanks.BindView")
+@SupportedAnnotationTypes({"com.zwc.inject.annotation.BindView", "com.zwc.inject.annotation.BindViews", "com.zwc.inject.annotation.Onclick"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class BindViewProcessor extends AbstractProcessor {
     private Messager messager;
@@ -68,9 +68,10 @@ public class BindViewProcessor extends AbstractProcessor {
             String packageName = variableElementList.get(0).getEnclosingElement().getEnclosingElement().toString();
             StringBuilder builder = new StringBuilder()
                     .append("package ").append(packageName).append(";\n\n")
-                    .append("public class ").append(className).append(SUFFIX).append("{\n") // open class
-                    .append("    public void bind(Object target) {\n")
-                    .append("        ").append(className).append(" activity = (").append(className).append(")target;\n");
+                    .append("import com.zwc.inject.provider.Provider; \n")
+                    .append("public class ").append(className).append(SUFFIX).append(" implements com.zwc.inject.IBind ").append("{\n") // open class
+                    .append("    public void inject(Object host, Object object, Provider provider) {\n")
+                    .append("        ").append(className).append(" activity = (").append(className).append(")host;\n");
 
             for (VariableElement variableElement : variableElementList) {
                 BindView bindView = variableElement.getAnnotation(BindView.class);
