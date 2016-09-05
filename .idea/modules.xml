@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/BKnifeDemo.iml" filepath="$PROJECT_DIR$/BKnifeDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bknife/bknife.iml" filepath="$PROJECT_DIR$/bknife/bknife.iml" />
+      <module fileurl="file://$PROJECT_DIR$/injectdemo/injectdemo.iml" filepath="$PROJECT_DIR$/injectdemo/injectdemo.iml" />
+    </modules>
+  </component>
+</project>
