@@ -17,7 +17,13 @@ public class BKnife {
 
     private static final ViewProvider viewProvider = new ViewProvider();
     private static final HashMap<String, IBind> injectMap = new HashMap<>();
-
+    /**
+     * 自定义view时使用;
+     * @param view
+     */
+    public static void inject(View view) {
+        inject(view, view, viewProvider);
+    }
     /**
      * 绑定Activity时使用;
      * @param activity
@@ -35,7 +41,7 @@ public class BKnife {
         inject(host, view, viewProvider);
     }
 
-    private static void inject(Object host, Object object, Provider provider) {
+    private static void inject(Object host, Object tagert, Provider provider) {
         String className = host.getClass().getName();
         try {
             IBind inject = injectMap.get(className);
@@ -45,9 +51,12 @@ public class BKnife {
                 inject = (IBind) aClass.newInstance();
                 injectMap.put(className, inject);
             }
-            inject.inject(host, object, provider);
+            inject.inject(host, tagert, provider);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public static void reset(Object obj){
+
     }
 }

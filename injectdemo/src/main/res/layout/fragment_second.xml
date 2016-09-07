@@ -12,12 +12,10 @@
         android:layout_height="wrap_content"
         android:text="第2个fragment"
         android:layout_marginBottom="20dp"/>
-    <TextView
-        android:id="@+id/tv_thrid_frag"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"/>
+
+    <inject.zwc.com.injectdemo.view.CustomView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 
 </LinearLayout>

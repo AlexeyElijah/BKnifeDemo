@@ -1,5 +1,6 @@
 package inject.zwc.com.injectdemo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -14,12 +15,14 @@ import com.zwc.inject.annotation.OnClick;
 import inject.zwc.com.injectdemo.adapter.FragContainerVPAdapter;
 
 public class MainActivity extends AppCompatActivity {
+
+
     @BindView(R.id.tv_container)
-    TextView mTvContainer;
+    TextView tvContainer;
+    @BindView(R.id.vp_frag_container)
+    ViewPager vpFragContainer;
     @BindViews({R.id.tv_binds_container1, R.id.tv_binds_container2, R.id.tv_binds_container3, R.id.tv_binds_container4})
     TextView[] mTvConArray;
-    @BindView(R.id.vp_frag_container)
-    ViewPager mFragContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +33,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startBinds() {
-        mTvContainer.setText("bind succsess");
+        tvContainer.setText("bind succsess");
         for (int i = 0; i < mTvConArray.length; i++) {
             mTvConArray[i].setText("bins+" + i + "   ");
         }
-        mFragContainer.setAdapter(new FragContainerVPAdapter(getSupportFragmentManager()));
+        vpFragContainer.setAdapter(new FragContainerVPAdapter(getSupportFragmentManager()));
     }
 
     @OnClick(R.id.bt_click1)
@@ -50,5 +53,8 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.bt_click3)
     public void onBt3Click() {
         Toast.makeText(this, "按钮3被点击了", Toast.LENGTH_SHORT).show();
+        Intent intent =  new Intent();
+        intent.setClass(this,TestActivity.class);
+        startActivity(intent);
     }
 }

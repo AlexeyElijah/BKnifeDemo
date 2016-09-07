@@ -4,5 +4,5 @@ import com.zwc.inject.provider.Provider;
 
 public interface IBind<T> {
 
-    void inject(T host, Object object, Provider provider);
+    void inject(T host, Object tagert, Provider provider);
 }
